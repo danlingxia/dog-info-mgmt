@@ -1,0 +1,20 @@
+spring:
+  datasource:                                           # 数据源的相关配置
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/dog_home?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+    username: root
+    password: "******"
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+minio:
+  bucket: "dog.pic"
+  host: "http://localhost:9000"
+  url: "${minio.host}/${minio.bucket}/"
+  access-key: "***"
+  secret-key: "******"
