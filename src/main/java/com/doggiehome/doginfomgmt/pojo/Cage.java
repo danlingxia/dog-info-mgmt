@@ -9,54 +9,38 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
+/**
+ * 笼子表
+ */
 @Entity
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
-public class DogImg {
+public class Cage {
 
     /**
-     * 图片主键
+     *主键，笼子id
      */
     @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    /**
-     * 狗狗外键id 狗狗外键id
-     */
-
-    private int dogId;
 
     /**
-     * 图片地址 图片地址
+     * 小院
      */
     @Column(nullable = false)
-    private String url;
+    private int yardId;
+
+
 
     /**
-     * 顺序 图片顺序，从小到大
+     * 笼子名字
      */
-    @Column(nullable = false)
-    private Integer sort;
+    private String name;
 
-    /**
-     * 是否主图 是否主图，1：是，0：否
-     */
-    @Column(nullable = false)
-    private Integer isMain;
 
-    /**
-     * 图片宽度
-     */
-    @Column(nullable = false)
-    private Integer width;
-
-    /**
-     * 图片高度
-     */
-    @Column(nullable = false)
-    private Integer height;
 
     /**
      * 创建时间
@@ -67,6 +51,7 @@ public class DogImg {
     /**
      * 更新时间
      */
+
     @LastModifiedDate
     private Date updatedTime;
 }

@@ -1,0 +1,14 @@
+package com.doggiehome.doginfomgmt.repository.redis;
+
+public interface DataCacheRepository<T> {
+
+    boolean add(String collection, String hkey, T object);
+
+    boolean add(String collection, String hkey, T object, Long timeout);
+
+    boolean delete(String collection, String hkey);
+
+    T find(String collection, String hkey, Class<T> tClass);
+
+    Boolean isAvailable();
+}

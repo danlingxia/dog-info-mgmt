@@ -1,0 +1,108 @@
+package com.doggiehome.doginfomgmt.repository.redis;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
+@Repository
+@Slf4j
+public class CacheRepository<T> implements DataCacheRepository<T> {
+    @Autowired
+    RedisTemplate template;
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("UTC");
+
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.setTimeZone(DEFAULT_TIMEZONE);
+    }
+
+    Logger logger = LoggerFactory.getLogger(CacheRepository.class);
+
+    @Value("${spring.redis.default.timeout}")
+    Long defaultTimeOut;
+
+
+
+    @Override
+    public boolean add(String collection, String hkey, T object) {
+
+        try {
+            String jsonObject = OBJECT_MAPPER.writeValueAsString(object);
+            template.opsForHash().put(collection, hkey, jsonObject);
+            return true;
+        } catch (Exception e) {
+            log.error("Unable to add object of key {} to cache collection '{}': {}",
+                    hkey, collection, e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean add(String collection, String hkey, T object, Long timeout) {
+
+        Long localTimeout;
+        if (timeout == null) {
+            localTimeout = defaultTimeOut;
+        } else {
+            localTimeout = timeout;
+        }
+        try {
+            String jsonObject = OBJECT_MAPPER.writeValueAsString(object);
+            template.opsForHash().put(collection, hkey, jsonObject);
+            template.expire(collection, localTimeout, TimeUnit.SECONDS);
+            return true;
+        } catch (Exception e) {
+            logger.error("Unable to add object of key {} to cache collection '{}': {}", hkey, collection,
+                    e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean delete(String collection, String hkey) {
+        try {
+            template.opsForHash().delete(collection, hkey);
+            return true;
+        } catch (Exception e) {
+            log.error("Unable to delete entry {} from cache collection '{}': {}", hkey, collection, e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public T find(String collection, String hkey, Class<T> tClass) {
+        try {
+            String jsonObj = String.valueOf(template.opsForHash().get(collection, hkey));
+            return OBJECT_MAPPER.readValue(jsonObj, tClass);
+        } catch (Exception e) {
+            if(e.getMessage() == null){
+                log.error("Entry '{}' does not exist in cache", hkey);
+            } else {
+                log.error("Unable to find entry '{}' in cache collection '{}': {}", hkey, collection, e.getMessage());
+            }
+            return null;
+        }
+    }
+
+
+
+    @Override
+    public Boolean isAvailable() {
+        try{
+            return template.getConnectionFactory().getConnection().ping() != null;
+        } catch (Exception e) {
+            log.warn("Redis server is not available at the moment.");
+        }
+        return false;
+    }
+}

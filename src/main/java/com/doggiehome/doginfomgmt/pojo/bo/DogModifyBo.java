@@ -11,8 +11,11 @@ import java.util.List;
 
 @Setter
 @Getter
-@ApiModel(value = "狗狗对象BO", description = "从客户端，由管理员用户传入的数据封装在此实体中")
-public class DogBo {
+@ApiModel(value = "狗狗对象修改BO", description = "从客户端，由管理员用户传入的修改数据封装在此实体中")
+public class DogModifyBo {
+
+    @ApiModelProperty(value = "狗狗id", name = "id", example = "1", required = true)
+    private int id;
 
     @ApiModelProperty(value = "小院id", name = "yardId", example = "1", required = true)
     private int yardId;
@@ -50,8 +53,13 @@ public class DogBo {
     @ApiModelProperty(value = "出身，0:未知, 1：被遗弃,  2：跑丢， 3：流浪二代", name = "background", allowableValues="0, 1, 2, 3")
     private int background;
 
+    @ApiModelProperty(value = "被领养状态, 1:待领养 2:已领养", name = "adoptedStatus", example = "1", required = true)
+    private int adoptedStatus;
+
+
     @ApiModelProperty(value = "图片", name = "pictures", required = true)
     private List<String> pictures;
+
 
 
 

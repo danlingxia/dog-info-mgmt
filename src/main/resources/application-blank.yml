@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${your.host}:${your.port}/dog_home?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useAffectedRows=true
+    username: root
+    password: ${your.mysql.password}
+
+minio:
+  bucket: "dog.pic"
+  host: "http://${your.minio.host}:9000"
+  url: "http://${your.minio.host}:9000/dog.pic"
+  accessKey: "${your.minio.accessKey}"
+  secretKey: "${your.minio.secretKey}"
+
+cookie:
+  name: "doggie_home_login_token"
+  domain: "localhost"
