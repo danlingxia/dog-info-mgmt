@@ -23,6 +23,9 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Api(value = "狗狗信息管理相关", tags = {"狗狗信息管理相关的api接口"})
@@ -73,6 +76,12 @@ public class DogManageController {
         }
         if (dogBo.getPictures().size() == 0){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "请传入图片");
+        }
+        //加入生日时间判断
+        ZonedDateTime zny = ZonedDateTime.now(ZoneId.of("UTC+8"));
+        LocalDateTime ldtNow = zny.toLocalDateTime();
+        if (dogBo.getBirthday().isAfter(ldtNow)){
+            return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "生日不能在未来");
         }
         if ((Boolean) cageService.findCage(dogBo.getCageId()).getData() == false){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "该笼子不存在");

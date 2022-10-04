@@ -8,7 +8,9 @@ import com.doggiehome.doginfomgmt.repository.ManagerRepository;
 import com.doggiehome.doginfomgmt.service.ManagerService;
 import com.doggiehome.doginfomgmt.util.MD5Util;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.EnumMap;
 
 @Service("ManagerService")
@@ -70,8 +73,16 @@ public class ManagerServiceImpl implements ManagerService {
             manager.setPassword(encodedMsg);
             manager.setSecretKey(salt);
             manager.setRole(role);
-            managerRepository.save(manager);
-            return ServerResponse.successResponse(manager);
+
+            Manager managerData = managerRepository.saveAndFlush(manager);
+
+//            返回之前将敏感数据剔除
+            ManagerVo managerVo = new ManagerVo(managerData);
+
+            return ServerResponse.successResponse(managerVo);
+
+
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {

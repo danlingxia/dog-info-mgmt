@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.ContextLoader;
 import springfox.documentation.annotations.ApiIgnore;
@@ -134,7 +135,15 @@ public class ManagerController {
 //        System.out.println(""+ request.getSession(false).getMaxInactiveInterval());
 //        request.getSession(false).getAttribute(Const.CURRENT_USER);
 
-        ServerResponse serverResponse = managerService.newManager(username, password, role);
-        return serverResponse;
+        try {
+            ServerResponse serverResponse = managerService.newManager(username, password, role);
+
+            return serverResponse;
+        } catch (DataIntegrityViolationException e){
+
+            ServerResponse serverResponse = ServerResponse.errorResponse(ResponseCode.MANAGER_EXIST.getCode(), ResponseCode.MANAGER_EXIST.getDesc());
+            return serverResponse;
+        }
+//        return serverResponse;
     }
 }

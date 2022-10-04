@@ -23,6 +23,12 @@ public interface DogRepository extends JpaRepository<Dog, Integer> {
 //    @Query("update dog d set ")
 //    int updateDogById();
 
+
+
+
+//    @Query(value = "", nativeQuery = true)
+//    int saveIgnoreIfExist(Dog dog);
+
     @Query(value = "select dog.id, dog.name, dog.birthday, dog.sex, dog.size, dog.hair_length, dog_img.url, dog_img.width, dog_img.height from dog left join dog_img on  dog_img.dog_id = dog.id and dog_img.is_main = 1 where dog.id in :dogIds ", nativeQuery = true)
     List<Object[]> getDogList(@Param("dogIds") List<Integer> dogIds);
 

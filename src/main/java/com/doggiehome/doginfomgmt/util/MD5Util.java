@@ -101,17 +101,17 @@ public class MD5Util {
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
      */
-    public static EnumMap<EncodePair, String> fixedAndRandomSaltMD5(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-        String frontSalt = "afeu$%#SDCV*YG)87ygv87403pgh-t%^(&)U_{$^DSXC*";
-//        System.out.println("固定盐 ： " + frontSalt);
-//        SecretKey MD5_KEY = new SecretKeySpec(frontSalt.getBytes(Charsets.UTF_8), "HmacMD5");
-//        //固定盐加密后结果
-//        String beforeBackendMsg = encode(MD5_KEY, password);
-        EnumMap<EncodePair, String> enumMapFixed = fixedSaltMD5(frontSalt, password);
-//        随机盐加密后结果
-        EnumMap<EncodePair, String> enumMapRandom = randomSaltMD5(enumMapFixed.get(EncodePair.ENCODED_MSG));
-        return enumMapRandom;
-    }
+//    public static EnumMap<EncodePair, String> fixedAndRandomSaltMD5(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+//        String frontSalt = "afeu$%#SDCV*YG)87ygv87403pgh-t%^(&)U_{$^DSXC*";
+////        System.out.println("固定盐 ： " + frontSalt);
+////        SecretKey MD5_KEY = new SecretKeySpec(frontSalt.getBytes(Charsets.UTF_8), "HmacMD5");
+////        //固定盐加密后结果
+////        String beforeBackendMsg = encode(MD5_KEY, password);
+//        EnumMap<EncodePair, String> enumMapFixed = fixedSaltMD5(frontSalt, password);
+////        随机盐加密后结果
+//        EnumMap<EncodePair, String> enumMapRandom = randomSaltMD5(enumMapFixed.get(EncodePair.ENCODED_MSG));
+//        return enumMapRandom;
+//    }
 
 
 

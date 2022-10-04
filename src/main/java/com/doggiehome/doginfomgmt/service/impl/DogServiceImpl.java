@@ -24,9 +24,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.sql.Timestamp;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -250,7 +249,19 @@ public class DogServiceImpl implements DogService {
             Object[] o = (Object[]) iterator.next();
             dogListVo.setId((Integer) o[0]);
             dogListVo.setName((String) o[1]);
-            dogListVo.setBirthday((Date) o[2]);
+//            数据库中无时区的时间
+            Timestamp timestamp = (Timestamp) o[2];
+            LocalDateTime ldt = timestamp.toLocalDateTime();
+//            当前北京时间
+            ZonedDateTime zny = ZonedDateTime.now(ZoneId.of("UTC+8"));
+//            当前北京时间去掉时区
+            LocalDateTime ldtNow = zny.toLocalDateTime();
+//            生日到当前时间的时间间隔即年龄
+            Period period = Period.between(ldt.toLocalDate(), ldtNow.toLocalDate());
+
+            dogListVo.setAge(period);
+
+//            dogListVo.setBirthday((Date) o[2]);
             dogListVo.setSex((int) o[3]);
             dogListVo.setSize((int) o[4]);
             dogListVo.setHairLength((int) o[5]);

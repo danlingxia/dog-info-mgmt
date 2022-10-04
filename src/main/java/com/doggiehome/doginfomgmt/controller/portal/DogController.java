@@ -1,6 +1,7 @@
 package com.doggiehome.doginfomgmt.controller.portal;
 
 import com.doggiehome.doginfomgmt.common.Const;
+import com.doggiehome.doginfomgmt.common.ResponseCode;
 import com.doggiehome.doginfomgmt.common.ServerResponse;
 import com.doggiehome.doginfomgmt.service.DogImgService;
 import com.doggiehome.doginfomgmt.service.DogService;
@@ -232,7 +233,15 @@ public class DogController {
 //        return dogService.findDog(id);
 //        if (range)
 //        return dogService.findDogs(sex, range, size, hairLength, start, pageSize);
+        if (offset < 0) {
+            return ServerResponse.errorResponse(ResponseCode.START_INDEX_NEGATIVE.getCode(), ResponseCode.START_INDEX_NEGATIVE.getDesc());
+        }
+        if (limit <= 0) {
+            return ServerResponse.errorResponse(ResponseCode.PAGE_SIZE_NO_POSITIVE.getCode(), ResponseCode.PAGE_SIZE_NO_POSITIVE.getDesc());
+        }
         List<Integer> dogIds;
+
+//        nextOffset : 下一页起始index
         int nextOffset = offset + limit;
 //        if (null != seed){
 //            if(null != randomList.get(seed)){
@@ -251,8 +260,25 @@ public class DogController {
         ServerResponse response = dogService.findDogIds(sex, range, size, hairLength);
 //        List<Object[]> dogListVos = dogRepository.getDogList((List<Integer>) response.getData());
         dogIds = (List<Integer>) response.getData();
-        List<Integer> subList = dogIds.subList(0 < offset && offset < dogIds.size()? offset:0,
-                        offset < nextOffset && nextOffset < dogIds.size()? nextOffset:Math.min(offset + Const.PAGE_SIZE, dogIds.size()));
+
+
+        List<Integer> subList;
+        if (offset > dogIds.size()) {
+//            subList 不包含元素
+            subList = new ArrayList<>();
+        } else {
+            subList = dogIds.subList(offset, Math.min(nextOffset, dogIds.size()));
+        }
+
+
+
+//        List<Integer> subList = dogIds.subList(0 < offset && offset < dogIds.size()? offset:0,
+//                        offset < nextOffset && nextOffset < dogIds.size()? nextOffset:Math.min(offset + Const.PAGE_SIZE, dogIds.size()));
+//
+
+//        此时 offset >= 0, nextOffset > offset
+
+
 //            Long seed = System.currentTimeMillis();
 //        Long seedNew = System.currentTimeMillis();
 //

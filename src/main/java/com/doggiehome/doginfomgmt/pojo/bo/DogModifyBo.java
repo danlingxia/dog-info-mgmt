@@ -26,7 +26,7 @@ public class DogModifyBo {
     @ApiModelProperty(value = "狗狗名字", name = "name", example = "小白")
     private String name;
 
-    @ApiModelProperty(value = "生日", name = "birthday", example = "yyyy-MM-ddThh-MM")
+    @ApiModelProperty(value = "生日", name = "birthday", example = "yyyy-MM-ddThh:MM")
     private LocalDateTime birthday;
 
     @ApiModelProperty(value = "性别， 0：未知, 1：公，2：母", name = "sex", allowableValues="0, 1, 2")

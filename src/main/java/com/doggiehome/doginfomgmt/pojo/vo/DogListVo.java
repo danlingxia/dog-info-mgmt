@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.time.Period;
 import java.util.Date;
 //
 //@SqlResultSetMapping
@@ -60,10 +61,14 @@ public class DogListVo {
 
 
 
+//    /**
+//     * 生日
+//     */
+//    private Date birthday;
     /**
-     * 生日
+     * 年龄(单位：月)
      */
-    private Date birthday;
+    private Period age;
 
     /**
      * 性别， 0：未知, 1：公，2：母
