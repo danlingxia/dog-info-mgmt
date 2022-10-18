@@ -5,12 +5,12 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.stereotype.Component;
+//import org.hibernate.annotations.Table;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Date;
-
-//import org.hibernate.annotations.Table;
 
 @Entity
 @Getter
@@ -108,13 +108,10 @@ public class Dog {
     private int background;
 
     /**
-     * 被领养状态, 1:待领养 2:已领养 3:中转中 4:参加活动中 5:在笼中
+     * 被领养状态, 1:待领养 2:已领养
      */
 
     private int adoptedStatus;
-
-    @Column(nullable = false)
-    private int remark;
 
     /**
      * 创建时间

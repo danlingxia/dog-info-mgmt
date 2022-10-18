@@ -2,18 +2,17 @@ package com.doggiehome.doginfomgmt.service.impl;
 
 import com.doggiehome.doginfomgmt.common.ResponseCode;
 import com.doggiehome.doginfomgmt.common.ServerResponse;
-import com.doggiehome.doginfomgmt.pojo.Adopter;
 import com.doggiehome.doginfomgmt.pojo.Dog;
 import com.doggiehome.doginfomgmt.pojo.DogImg;
 import com.doggiehome.doginfomgmt.pojo.bo.DogBo;
 import com.doggiehome.doginfomgmt.pojo.bo.DogModifyBo;
 import com.doggiehome.doginfomgmt.pojo.vo.DogListVo;
 import com.doggiehome.doginfomgmt.pojo.vo.DogManageListVo;
-import com.doggiehome.doginfomgmt.pojo.vo.DogModifyVo;
 import com.doggiehome.doginfomgmt.pojo.vo.DogVo;
-import com.doggiehome.doginfomgmt.repository.*;
+import com.doggiehome.doginfomgmt.repository.DogImgRepository;
+import com.doggiehome.doginfomgmt.repository.DogRepository;
+import com.doggiehome.doginfomgmt.repository.DogRepositoryCustom;
 import com.doggiehome.doginfomgmt.service.DogService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -26,10 +25,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,12 +40,6 @@ public class DogServiceImpl implements DogService {
     @Autowired
     DogImgRepository dogImgRepository;
 
-    @Autowired
-    AdoptRepository adoptRepository;
-
-    @Autowired
-    TransferRepository transferRepository;
-
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public ServerResponse deleteADog(int dogId) {
@@ -62,22 +52,6 @@ public class DogServiceImpl implements DogService {
         }else{
             return ServerResponse.successResponse(ResponseCode.SUCCESS.getCode(), ResponseCode.SUCCESS.getDesc());
         }
-    }
-
-    @Override
-    public void addAdopter(Adopter adopter) {
-        adoptRepository.save(adopter);
-        dogRepository.updateAdoptById(adopter.getId(),2);
-    }
-
-    @Override
-    public void updateActivityByDogId(Integer dogId) {
-        dogRepository.updateAdoptById(dogId,4);
-    }
-
-    @Override
-    public void updateCageByDogId(Integer cageId, Integer dogId) {
-        dogRepository.updateCageByDogId(cageId,dogId,5);
     }
 
 //    @Override
@@ -150,53 +124,6 @@ public class DogServiceImpl implements DogService {
     }
 
 
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    @Override
-    public ServerResponse newDog(DogModifyVo dogModifyVo) {
-        Dog dog = new Dog();
-
-        BeanUtils.copyProperties(dogModifyVo,dog);
-        Dog dogEntity = dogRepository.save(dog);
-
-        List<String> pictures  = dogModifyVo.getPictures();
-        int num = pictures.size();
-        for (int i = 0; i < num; i++){
-            DogImg dogImg = new DogImg();
-            String urlString = pictures.get(i);
-            URL url = null;
-            BufferedImage image = null;
-            try {
-                url = new URL(urlString);
-                image = ImageIO.read(url);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            int width = image.getWidth();
-            int height = image.getHeight();
-            dogImg.setDogId(dogEntity.getId());
-            dogImg.setUrl(urlString);
-            dogImg.setWidth(width);
-            dogImg.setHeight(height);
-
-            if (i == 0){
-                dogImg.setIsMain(1);
-            }else {
-                dogImg.setIsMain(0);
-            }
-            dogImg.setSort(i+1);
-            dogImgRepository.save(dogImg);
-        }
-
-
-//        dogImgService.saveDogImg();
-
-        return ServerResponse.successResponse(dogEntity);
-    }
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public ServerResponse modifyADog(DogModifyBo dogModifyBo) throws IOException {
@@ -296,12 +223,6 @@ public class DogServiceImpl implements DogService {
         dogVo.setDog(dog);
         dogVo.setDogImgList(dogImgs);
         return ServerResponse.successResponse(dogVo);
-    }
-
-    @Override
-    public ServerResponse getDogByName(String name) {
-        Dog dog = dogRepository.getDogByName(name);
-        return ServerResponse.successResponse(dog);
     }
 
 //    public ServerResponse findDogs(int sex, List<Integer> range, int size, int hairLength, int pageNum, int pageSize){

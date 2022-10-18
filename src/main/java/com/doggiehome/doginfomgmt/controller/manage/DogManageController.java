@@ -6,8 +6,9 @@ import com.doggiehome.doginfomgmt.common.ServerResponse;
 import com.doggiehome.doginfomgmt.pojo.Dog;
 import com.doggiehome.doginfomgmt.pojo.bo.DogBo;
 import com.doggiehome.doginfomgmt.pojo.bo.DogModifyBo;
-import com.doggiehome.doginfomgmt.pojo.vo.DogModifyVo;
-import com.doggiehome.doginfomgmt.service.*;
+import com.doggiehome.doginfomgmt.service.CageService;
+import com.doggiehome.doginfomgmt.service.DogImgService;
+import com.doggiehome.doginfomgmt.service.DogService;
 import com.doggiehome.doginfomgmt.util.MinioHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,22 +63,27 @@ public class DogManageController {
      * 增加一条狗狗信息
      */
     //TODO 增加检查笼子是否存在的逻辑
+
     @ApiOperation(value = "增加一条狗狗数据", notes = "增加一条狗狗数据", httpMethod = "POST")
     @PostMapping("/newDog")
-    public ServerResponse newDog(@RequestBody @Valid DogBo dogBo, BindingResult result) {
+    public ServerResponse newDog(@RequestBody @Valid DogBo dogBo, BindingResult result){
+//        Date d = new Date();
+//        System.out.println(dogBo);
         if (result.hasErrors()) {
+//            Map<String, String> errorMap = getErrors(result);
+//            return ServerResponse.errorResponse(errorMap);
             return ServerResponse.errorResponse(result);
         }
-        if (dogBo.getPictures().size() == 0) {
+        if (dogBo.getPictures().size() == 0){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "请传入图片");
         }
         //加入生日时间判断
         ZonedDateTime zny = ZonedDateTime.now(ZoneId.of("UTC+8"));
         LocalDateTime ldtNow = zny.toLocalDateTime();
-        if (dogBo.getBirthday().isAfter(ldtNow)) {
+        if (dogBo.getBirthday().isAfter(ldtNow)){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "生日不能在未来");
         }
-        if ((Boolean) cageService.findCage(dogBo.getCageId()).getData() == false) {
+        if ((Boolean) cageService.findCage(dogBo.getCageId()).getData() == false){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "该笼子不存在");
         }
 
@@ -90,6 +96,7 @@ public class DogManageController {
 
         return dogService.findOneDog(dogEntity.getId());
     }
+
 
 
     @ApiOperation(value = "删除狗狗信息", notes = "删除狗狗信息", httpMethod = "DELETE")
@@ -109,10 +116,10 @@ public class DogManageController {
 //            return ServerResponse.errorResponse(errorMap);
             return ServerResponse.errorResponse(result);
         }
-        if (dogModifyBo.getPictures().size() == 0) {
+        if (dogModifyBo.getPictures().size() == 0){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "请传入图片");
         }
-        if ((Boolean) cageService.findCage(dogModifyBo.getCageId()).getData() == false) {
+        if ((Boolean) cageService.findCage(dogModifyBo.getCageId()).getData() == false){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "该笼子不存在");
         }
         ServerResponse serverResponse = dogService.modifyADog(dogModifyBo);
@@ -127,7 +134,7 @@ public class DogManageController {
      */
     @ApiOperation(value = "根据狗狗id查找一条狗狗数据", notes = "根据狗狗id查找一条狗狗数据", httpMethod = "GET")
     @GetMapping("/searchOneDog")
-    public ServerResponse searchOneDog(@ApiParam(value = "狗狗id", required = true) @RequestParam int id) {
+    public ServerResponse searchOneDog(@ApiParam(value = "狗狗id", required = true) @RequestParam int id){
         return dogService.findOneDog(id);
 
     }
@@ -159,7 +166,7 @@ public class DogManageController {
         if (null == pictures) {
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "请添加照片");
         }
-        if (pictures.size() > Const.UPLOAD_MAX_NUM) {
+        if (pictures.size() > Const.UPLOAD_MAX_NUM){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "照片不能超过" + Const.UPLOAD_MAX_NUM + "张");
         }
         int num = pictures.size();
@@ -222,6 +229,18 @@ public class DogManageController {
 //        return ;
 //    }
 
+    /**
+     * 修改一条狗狗信息
+     */
+
+
+
+
+
+
+
+
+
 
     /**
      * 领养，修改狗狗状态
@@ -253,6 +272,8 @@ public class DogManageController {
 //        return dogService.findDogsByCageAndYard(yardId, cageId,  pageNumber,  pageSize);
 //
 //    }
+
+
     @ApiOperation(value = "根据小院id和其他查询条件查询笼子里的狗狗", notes = "根据小院id和其他查询条件查询笼子里的狗狗", httpMethod = "GET")
     @GetMapping("/find-dogs")
     public ServerResponse findDogs(@ApiParam(value = "小院id", required = true) @RequestParam int yardId,
@@ -261,57 +282,17 @@ public class DogManageController {
                                    @ApiParam(value = "编号") @RequestParam(required = false) String identifier,
                                    @ApiParam(value = "狗狗名称") @RequestParam(required = false) String dogName,
                                    @ApiParam(value = "页数", required = true) @RequestParam int pageNumber,
-                                   @ApiParam(value = "每页大小", required = true) @RequestParam int pageSize) {
-        if (pageNumber < 1) {
+                                   @ApiParam(value = "每页大小", required = true) @RequestParam int pageSize)
+    {
+        if (pageNumber < 1){
             return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "起始页页数不能小于1");
         }
         pageNumber = pageNumber - 1;
+
         return dogService.findDogByTerm(yardId, cageId, cageName, identifier, dogName, pageNumber, pageSize);
     }
 
-    /**
-     * 管理员根据狗狗名称查找某条狗狗信息
-     */
-    @ApiOperation(value = "根据狗狗名称查找一条狗狗数据", notes = "根据狗狗名称查找一条狗狗数据", httpMethod = "GET")
-    @GetMapping("/searchOneDogByName")
-    public ServerResponse searchOneDogByName(@ApiParam(value = "狗狗名字", required = true) @RequestParam String dogName) {
-        return dogService.getDogByName(dogName);
-    }
 
-    @ApiOperation(value = "编辑一条狗狗数据(前端传回)", notes = "编辑一条狗狗数据", httpMethod = "POST")
-    @PostMapping("/editDog")
-    public ServerResponse newDog(@RequestBody @Valid DogModifyVo dogVo, BindingResult result) {
-        if (result.hasErrors()) {
-            return ServerResponse.errorResponse(result);
-        }
-        if (dogVo.getPictures().size() == 0) {
-            return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "请传入图片");
-        }
-        //加入生日时间判断
-        ZonedDateTime zny = ZonedDateTime.now(ZoneId.of("UTC+8"));
-        LocalDateTime ldtNow = zny.toLocalDateTime();
-        if (dogVo.getBirthday().isAfter(ldtNow)) {
-            return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "生日不能在未来");
-        }
-        if ((Boolean) cageService.findCage(dogVo.getCageId()).getData() == false) {
-            return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "该笼子不存在");
-        }
 
-        Dog dogEntity = null;
-        try {
-            dogEntity = (Dog) dogService.newDog(dogVo).getData();
-        } catch (IOException e) {
-            return ServerResponse.errorResponse(ResponseCode.ERROR.getCode(), "image exception");
-        }
-
-        return dogService.findOneDog(dogEntity.getId());
-    }
-
-    @ApiOperation(value = "将狗狗的状态更新为参加活动中", notes = "将狗狗的状态更新为参加活动中", httpMethod = "POST")
-    @PostMapping("/updateActivityByDogId")
-    public ServerResponse updateActivityByDogId(@RequestParam Integer dogId) {
-        dogService.updateActivityByDogId(dogId);
-        return ServerResponse.successResponse(200,"更新成功");
-    }
 
 }
