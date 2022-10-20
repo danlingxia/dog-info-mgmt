@@ -9,9 +9,7 @@ import com.doggiehome.doginfomgmt.pojo.bo.DogModifyBo;
 import com.doggiehome.doginfomgmt.pojo.vo.DogListVo;
 import com.doggiehome.doginfomgmt.pojo.vo.DogManageListVo;
 import com.doggiehome.doginfomgmt.pojo.vo.DogVo;
-import com.doggiehome.doginfomgmt.repository.DogImgRepository;
-import com.doggiehome.doginfomgmt.repository.DogRepository;
-import com.doggiehome.doginfomgmt.repository.DogRepositoryCustom;
+import com.doggiehome.doginfomgmt.repository.*;
 import com.doggiehome.doginfomgmt.service.DogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -25,7 +23,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,12 @@ public class DogServiceImpl implements DogService {
     @Autowired
     DogImgRepository dogImgRepository;
 
+    @Autowired
+    AdoptRepository adoptRepository;
+
+    @Autowired
+    TransferRepository transferRepository;
+
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public ServerResponse deleteADog(int dogId) {
@@ -52,6 +59,44 @@ public class DogServiceImpl implements DogService {
         }else{
             return ServerResponse.successResponse(ResponseCode.SUCCESS.getCode(), ResponseCode.SUCCESS.getDesc());
         }
+    }
+
+    @Override
+    public ServerResponse updateActivityByDogId(Integer dogId) {
+        int i = dogRepository.updateAdoptById(dogId,4);
+        if (i != 0){
+            return ServerResponse.successResponse(ResponseCode.SUCCESS.getCode(), ResponseCode.SUCCESS.getDesc());
+        }else {
+            return ServerResponse.errorResponse(ResponseCode.DOG_NO_EXIST.getCode(), ResponseCode.ADOPT_NO_EXIST.getDesc());
+        }
+    }
+
+    @Override
+    public ServerResponse updateCageByDogId(Integer cageId, Integer dogId) {
+        int i = dogRepository.updateCageByDogId(cageId, dogId, 1);
+        if (i != 0){
+            return ServerResponse.successResponse(ResponseCode.SUCCESS.getCode(), ResponseCode.SUCCESS.getDesc());
+        }else{
+            return ServerResponse.errorResponse(ResponseCode.DOG_NO_EXIST.getCode(), ResponseCode.DOG_NO_EXIST.getDesc());
+        }
+    }
+
+    @Override
+    public ServerResponse getDogByName(String dogName, Integer pageNumber, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC,"id"));
+        Page<Dog> objects = dogRepository.getDogByName(dogName,pageable);
+        List<Dog> dogList = objects.getContent();
+        Page<Dog> dogPageResult = new PageImpl<Dog>(dogList, objects.getPageable(), objects.getTotalElements());
+        return ServerResponse.successResponse(dogPageResult);
+    }
+
+    @Override
+    public ServerResponse statusSearch(Integer adoptedStatus, Integer pageNumber, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC,"id"));
+        Page<Dog> objects = dogRepository.findDogByAdoptedStatus(adoptedStatus,pageable);
+        List<Dog> dogList = objects.getContent();
+        Page<Dog> dogPageResult = new PageImpl<Dog>(dogList, objects.getPageable(), objects.getTotalElements());
+        return ServerResponse.successResponse(dogPageResult);
     }
 
 //    @Override

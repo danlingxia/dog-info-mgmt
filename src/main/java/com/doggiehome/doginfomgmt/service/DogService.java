@@ -4,9 +4,7 @@ import com.doggiehome.doginfomgmt.common.ServerResponse;
 import com.doggiehome.doginfomgmt.pojo.bo.DogBo;
 import com.doggiehome.doginfomgmt.pojo.bo.DogModifyBo;
 
-import javax.validation.Valid;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 
 public interface DogService {
@@ -40,8 +38,6 @@ public interface DogService {
     ServerResponse findOneDog(int dogId);
 
 
-//    ServerResponse findDogs(int sex, List<Integer> month, int size, int hairLength, int pageNum, int pageSize);
-
     ServerResponse findDogIds(Integer sex, List<Integer> month, Integer size, Integer hairLength);
 
     ServerResponse findDogList(List<Integer> dogIds);
@@ -53,6 +49,15 @@ public interface DogService {
     ServerResponse modifyADog(DogModifyBo dogModifyBo) throws IOException;
 
     ServerResponse deleteADog(int dogId);
+
+    ServerResponse updateActivityByDogId(Integer dogId);
+
+    ServerResponse updateCageByDogId(Integer cageId, Integer dogId);
+
+
+    ServerResponse getDogByName(String dogName, Integer pageNumber, Integer pageSize);
+
+    ServerResponse statusSearch(Integer adoptedStatus, Integer pageNumber, Integer pageSize);
 
 //    ServerResponse existADog(int dogId);
 

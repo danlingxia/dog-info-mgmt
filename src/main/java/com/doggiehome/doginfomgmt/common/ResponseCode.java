@@ -8,7 +8,9 @@ public enum ResponseCode {
 //    不存在或者空
     DOG_NO_EXIST(1004, "the dog id does not exist"),
     CAGE_NO_EXIST(1005, "the cage id does not exist"),
+    ADOPT_NO_EXIST(1006, "the adopt does not exist"),
     CAGE_NO_EMPTY(2001, "the cage is not empty"),
+    PARAMETER_INVALID(2002, "the param is invalid"),
 
 //    权限相关
     NO_LOGIN(3001, "You haven't logged in yet, please log in to your account"),

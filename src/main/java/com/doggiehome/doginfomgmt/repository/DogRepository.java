@@ -8,13 +8,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
 public interface DogRepository extends JpaRepository<Dog, Integer> {
-    Dog findDogById(int id);
 
+    Dog findDogById(int id);
 
     List<Dog> findAllByCageId(int cageId);
 
@@ -74,4 +75,20 @@ public interface DogRepository extends JpaRepository<Dog, Integer> {
             countQuery = "select count(*)  from dog d inner join cage c on d.cage_id = c.id inner join dog_img i on  i.dog_id = d.id and i.is_main = 1 where  d.yard_id = :yardId and (:cageId is null or d.cage_id = :cageId)  and (:cageName is null or c.name like CONCAT('%',:cageName,'%')) and (:identifier is null or d.identifier = :identifier)  and (:dogName is null or d.name like CONCAT('%',:dogName,'%')) ",
             nativeQuery = true)
     Page<Object[]> getDogManageByTerm(int yardId, Integer cageId, String cageName, String identifier, String dogName, Pageable pageable);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update dog set adopted_status = :status where id = :id", nativeQuery = true)
+    int updateAdoptById(@Param("id") int id,@Param("status") int status);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update dog set adopted_status = :status, cage_id = :cageId where id = :dogId", nativeQuery = true)
+    int updateCageByDogId(@Param("cageId") Integer cageId, @Param("dogId") Integer dogId, @Param("status") Integer status);
+
+    @Query(value = "select * from dog left join dog_img on  dog_img.dog_id = dog.id and dog_img.is_main = 1 where dog.name = :name ", nativeQuery = true)
+    Page<Dog> getDogByName(String dogName, Pageable pageable);
+
+    @Query(value = "select * from dog left join dog_img on  dog_img.dog_id = dog.id and dog_img.is_main = 1 where dog.adopted_status = :adoptedStatus ", nativeQuery = true)
+    Page<Dog> findDogByAdoptedStatus(Integer adoptedStatus, Pageable pageable);
 }
