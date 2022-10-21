@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Setter
@@ -51,5 +52,7 @@ public class DogBo {
 
     @ApiModelProperty(value = "图片", name = "pictures", required = true)
     private List<String> pictures;
+
+
 
 }

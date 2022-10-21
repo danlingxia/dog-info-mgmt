@@ -3,6 +3,7 @@ package com.doggiehome.doginfomgmt.controller.manage;
 
 import com.doggiehome.doginfomgmt.common.ResponseCode;
 import com.doggiehome.doginfomgmt.common.ServerResponse;
+import com.doggiehome.doginfomgmt.pojo.Dog;
 import com.doggiehome.doginfomgmt.service.CageService;
 import com.doggiehome.doginfomgmt.service.DogService;
 import io.swagger.annotations.Api;
@@ -10,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Api(value = "笼子管理相关", tags = {"笼子管理相关的api接口"})
 @RequestMapping("cage")
